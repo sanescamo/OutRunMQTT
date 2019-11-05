@@ -85,6 +85,9 @@ struct Line
 
 
 
+#include <string>
+#include <windows.h>
+
 
 int main()
 {
@@ -95,13 +98,13 @@ int main()
 	Sprite object[50];
 	for (int i = 1; i <= 7; i++)
 	{
-		bool xx = t[i].loadFromFile("C:\\Users\\ASUS_PORTATIL\\source\\repos\\Arkanoid\\x64\\Debug\\images\\" + std::to_string(i) + ".png");
+		bool xx = t[i].loadFromFile(".\\images\\" + std::to_string(i) + ".png");
 		t[i].setSmooth(true);
 		object[i].setTexture(t[i]);
 	}
 	  
 	Texture bg;
-	bool xxx = bg.loadFromFile("C:\\Users\\ASUS_PORTATIL\\source\\repos\\Arkanoid\\x64\\Debug\\images\\bg.png");
+	bool xxx = bg.loadFromFile(".\\images\\bg.png");
 	
 	bg.setRepeated(true);
 	Sprite sBackground(bg);
