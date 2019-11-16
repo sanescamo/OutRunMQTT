@@ -5,11 +5,17 @@
 #include <SFML/Graphics.hpp>
 using namespace sf;
 
+#define MOSQUITTO_LOG_FILE "d:\\mosquitto.txt"
+
 int width = 1024;
 int height = 768;
 int roadW = 2000;
 int segL = 200; //segment length
 float camD = 0.84; //camera depth
+float playerX = 0;
+
+
+
 
 void drawQuad(RenderWindow &w, Color c, int x1, int y1, int w1, int x2, int y2, int w2)
 {
@@ -88,23 +94,134 @@ struct Line
 #include <string>
 #include <windows.h>
 
+#include <sstream>
+#include <string>
+#include <fstream>
+
+
+#include <iostream>
+#include <stdexcept>
+#include <stdio.h>
+#include <string>
+
+std::string exec_function() {
+	char buffer[2048];
+	std::string result = "";
+	FILE* pipe = _popen("d:\\mosquitto_sub2.bat","r");
+	std::string match_to_find = "sensornode/david/x/Accelerometer/y";
+	
+	if (!pipe) throw std::runtime_error("popen() failed!");
+	try {
+		while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+			std::string line(buffer);
+			
+			if (line.find(match_to_find) != std::string::npos) {
+				std::string strPlayerX = line.substr(match_to_find.length(), line.length());
+				printf("%s\r\n", strPlayerX.c_str());
+				if (atoi(strPlayerX.c_str()) < 0) {
+					playerX -= 0.1;
+					printf("Left\r\n");
+				}
+				else {
+					playerX += 0.1;
+					printf("Right\r\n");
+				}
+			}
+		}
+	}
+	catch (...) {
+		_pclose(pipe);
+		throw;
+	}
+	_pclose(pipe);
+	return result;
+}
+
+
+bool is_empty(std::ifstream& pFile)
+{
+	return pFile.peek() == std::ifstream::traits_type::eof();
+}
+
+//void readFileRealTime()
+//{
+//	std::string line;
+//
+//
+//	while (true)
+//	{
+//		printf("Abrimos\r\n");
+//		printf("Abrimos\r\n");
+//		printf("Abrimos\r\n");
+//		printf("Abrimos\r\n");
+//		printf("Abrimos\r\n");
+//		printf("Abrimos\r\n");
+//		printf("Abrimos\r\n");
+//		std::ifstream infile(MOSQUITTO_LOG_FILE);
+//		std::string match_to_find = "sensornode/david/x/Accelerometer/y";
+//
+//		if (is_empty(infile)) {
+//			Sleep(100);
+//			infile.close();
+//		}
+//		else
+//		{
+//
+//			while (std::getline(infile, line))
+//			{
+//				if (line.find(str) != std::string::npos) {
+//					std::string strPlayerX = line.substr(str.length(), line.length());
+//					printf("%s\r\n", strPlayerX.c_str());
+//					if (atoi(strPlayerX.c_str()) < 0){
+//							playerX -= 0.1;
+//							printf("Left\r\n");
+//					}
+//					else {
+//						playerX += 0.1;
+//						printf("Right\r\n");
+//					}
+//					Sleep(550);
+//				}								
+//			}
+//		}
+//	}
+//
+//}
+
+
+void launchMosquitto_sub() 
+{
+	int error = system("d:\\mosquitto_sub.bat");
+	printf("Error subscriber");
+}
+
+#include <thread>
 
 int main()
 {
+
+	std::remove(MOSQUITTO_LOG_FILE);
+	
+	//std::thread threadObj1(launchMosquitto_sub);
+	//std::thread threadObj2(readFileRealTime);
+	std::thread threadObj1(exec_function);
+
+
 	RenderWindow app(VideoMode(width, height), "Outrun Racing!");
 	app.setFramerateLimit(60);
+
 
 	Texture t[50];
 	Sprite object[50];
 	for (int i = 1; i <= 7; i++)
 	{
-		bool xx = t[i].loadFromFile(".\\images\\" + std::to_string(i) + ".png");
+		bool xx = t[i].loadFromFile("C:\\Users\\ASUS_PORTATIL\\source\\repos\\Arkanoid\\images\\" + std::to_string(i) + ".png");
 		t[i].setSmooth(true);
 		object[i].setTexture(t[i]);
 	}
 	  
 	Texture bg;
-	bool xxx = bg.loadFromFile(".\\images\\bg.png");
+	bool xxx = bg.loadFromFile("C:\\Users\\ASUS_PORTATIL\\source\\repos\\Arkanoid\\images\\bg.png");
 	
 	bg.setRepeated(true);
 	Sprite sBackground(bg);
@@ -133,9 +250,10 @@ int main()
 	}
 
 	int N = lines.size();
-	float playerX = 0;
+	
 	int pos = 0;
 	int H = 1500;
+
 
 	while (app.isOpen())
 	{
@@ -150,7 +268,7 @@ int main()
 
 		if (Keyboard::isKeyPressed(Keyboard::Right)) playerX += 0.1;
 		if (Keyboard::isKeyPressed(Keyboard::Left)) playerX -= 0.1;
-		/*if (Keyboard::isKeyPressed(Keyboard::Up)) */speed = 300;
+		/*if (Keyboard::isKeyPressed(Keyboard::Up)) */speed = 200;
 		if (Keyboard::isKeyPressed(Keyboard::Down)) speed = -200;
 		if (Keyboard::isKeyPressed(Keyboard::Tab)) speed *= 3;
 		if (Keyboard::isKeyPressed(Keyboard::W)) H += 100;
