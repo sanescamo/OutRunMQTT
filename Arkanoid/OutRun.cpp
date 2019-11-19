@@ -200,6 +200,11 @@ void launchMosquitto_sub()
 int main()
 {
 
+	//Initialize the subscriber class and subscriber to the topic sensornode/david/x/
+	pch* pch_;
+	pch_ = new pch("unique", "sensornode/david/x/#", "localhost", 1883);
+	int res;
+
 	std::remove(MOSQUITTO_LOG_FILE);
 	
 	//std::thread threadObj1(launchMosquitto_sub);
@@ -257,6 +262,12 @@ int main()
 
 	while (app.isOpen())
 	{
+
+		//Connect to the MQTT broker
+		res = pch_->loop(); // Keep MQTT connection
+		if (res)
+			pch_->reconnect();
+
 		Event e;
 		while (app.pollEvent(e))
 		{
