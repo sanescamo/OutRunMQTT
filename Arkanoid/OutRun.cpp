@@ -266,8 +266,8 @@ int main()
 
 		int speed = 0;
 
-		if (Keyboard::isKeyPressed(Keyboard::Right)) playerX += 0.1;
-		if (Keyboard::isKeyPressed(Keyboard::Left)) playerX -= 0.1;
+		if (Keyboard::isKeyPressed(Keyboard::Right)) playerX += 0.0005;
+		if (Keyboard::isKeyPressed(Keyboard::Left)) playerX -= 0.0005;
 		/*if (Keyboard::isKeyPressed(Keyboard::Up)) */speed = 200;
 		if (Keyboard::isKeyPressed(Keyboard::Down)) speed = -200;
 		if (Keyboard::isKeyPressed(Keyboard::Tab)) speed *= 3;
